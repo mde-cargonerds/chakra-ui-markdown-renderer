@@ -3,18 +3,20 @@ import deepmerge from 'deepmerge';
 import { Components } from 'react-markdown';
 import {
   Code,
-  Divider,
   Heading,
   Link,
   ListItem,
-  OrderedList,
+  ListRoot,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRoot,
+  TableRow,
   Text,
-  UnorderedList,
-} from '@chakra-ui/layout';
-import { Image } from '@chakra-ui/image';
-import { Checkbox } from '@chakra-ui/checkbox';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/table';
-import { chakra } from '@chakra-ui/system';
+} from '@chakra-ui/react';
+import { Image } from '@chakra-ui/react';
+import { Checkbox } from '@chakra-ui/react';
+import { chakra } from '@chakra-ui/react';
 
 type GetCoreProps = {
   children?: React.ReactNode;
@@ -73,9 +75,9 @@ export const defaults: Defaults = {
     const { children } = props;
     return <Text as="del">{children}</Text>;
   },
-  hr: props => {
+  /*  hr: props => {
     return <Divider />;
-  },
+  },*/
   a: Link,
   img: Image,
   text: props => {
@@ -85,10 +87,10 @@ export const defaults: Defaults = {
   ul: props => {
     const { ordered, children, depth } = props;
     const attrs = getCoreProps(props);
-    let Element = UnorderedList;
+    let Element = ListRoot;
     let styleType = 'disc';
     if (ordered) {
-      Element = OrderedList;
+      Element.defaultProps = { as: 'ol' };
       styleType = 'decimal';
     }
     if (depth === 1) styleType = 'circle';
@@ -107,10 +109,10 @@ export const defaults: Defaults = {
   ol: props => {
     const { ordered, children, depth } = props;
     const attrs = getCoreProps(props);
-    let Element = UnorderedList;
+    let Element = ListRoot;
     let styleType = 'disc';
     if (ordered) {
-      Element = OrderedList;
+      Element.defaultProps = { as: 'ol' };
       styleType = 'decimal';
     }
     if (depth === 1) styleType = 'circle';
@@ -131,9 +133,11 @@ export const defaults: Defaults = {
     let checkbox = null;
     if (checked !== null && checked !== undefined) {
       checkbox = (
-        <Checkbox isChecked={checked} isReadOnly>
-          {children}
-        </Checkbox>
+        <Checkbox.Root checked={checked} readOnly>
+          <Checkbox.HiddenInput />
+          <Checkbox.Control />
+          <Checkbox.Label>{children}</Checkbox.Label>
+        </Checkbox.Root>
       );
     }
     return (
@@ -163,15 +167,18 @@ export const defaults: Defaults = {
     const { children } = props;
     return <chakra.pre {...getCoreProps(props)}>{children}</chakra.pre>;
   },
-  table: Table,
-  thead: Thead,
-  tbody: Tbody,
-  tr: props => <Tr>{props.children}</Tr>,
-  td: props => <Td>{props.children}</Td>,
-  th: props => <Th>{props.children}</Th>,
+  table: TableRoot,
+  thead: TableHeader,
+  tbody: TableBody,
+  tr: props => <TableRow>{props.children}</TableRow>,
+  td: props => <TableCell>{props.children}</TableCell>,
+  th: props => <TableHeader>{props.children}</TableHeader>,
 };
 
-function ChakraUIRenderer(theme?: Defaults, merge = true): Components {
+export default function ChakraUIRenderer(
+  theme?: Defaults,
+  merge = true,
+): Components {
   const elements = {
     p: defaults.p,
     em: defaults.em,
@@ -207,4 +214,4 @@ function ChakraUIRenderer(theme?: Defaults, merge = true): Components {
   return elements;
 }
 
-export default ChakraUIRenderer;
+/* ChakraUIRenderer;*/
